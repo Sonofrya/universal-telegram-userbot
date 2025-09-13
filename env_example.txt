@@ -1,0 +1,37 @@
+# Telegram API настройки
+TELEGRAM_API_ID=your_api_id_here
+TELEGRAM_API_HASH=your_api_hash_here
+TELEGRAM_PHONE=your_phone_number
+TELEGRAM_SESSION_FILE=session.txt
+
+# Машинное обучение
+ML_MODEL_NAME=paraphrase-multilingual-MiniLM-L12-v2
+ML_SIMILARITY_THRESHOLD=0.7
+ML_MIN_TRAINING_EXAMPLES=3
+ML_AUTO_TRAIN_THRESHOLD=2
+ML_CLASSIFIER_MODEL=production_classifier
+
+# Фильтрация сообщений
+FILTER_MIN_LENGTH=5
+FILTER_BLACKLIST=спам,реклама,нежелательное слово
+FILTER_FORWARD_PATTERNS=пересланное сообщение,forwarded message,было переслано
+
+# Бизнес настройки (настройте под свою сферу)
+BUSINESS_DOMAIN=video_production
+BUSINESS_KEYWORDS=видеопродакшн,съемка,монтаж,рекламные ролики,видеоконтент
+TARGET_USER_IDS=user_id_1,user_id_2
+FULL_CYCLE_PHRASES=полный цикл,под ключ,комплексный,от и до
+
+# Примеры для разных сфер:
+
+# Для веб-разработки:
+# BUSINESS_DOMAIN=web_development
+# BUSINESS_KEYWORDS=веб-разработка,сайт,приложение,frontend,backend,полный цикл разработки
+
+# Для дизайна:
+# BUSINESS_DOMAIN=design
+# BUSINESS_KEYWORDS=дизайн,логотип,брендинг,графический дизайн,UI/UX
+
+# Для маркетинга:
+# BUSINESS_DOMAIN=marketing
+# BUSINESS_KEYWORDS=маркетинг,SMM,реклама,продвижение,контент-маркетинг
