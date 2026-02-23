@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import signal
 import sys
 from datetime import datetime
 
@@ -50,8 +51,8 @@ def setup_configuration():
     import os
     if not os.path.exists('.env'):
         print("❌ Файл .env не найден!")
-        print("📝 Создайте файл .env на основе env_example.txt")
-        print("   Скопируйте env_example.txt в .env и заполните настройки")
+        print("📝 Создайте файл .env на основе .env.example")
+        print("   Скопируйте .env.example в .env и заполните настройки")
         return False
     errors = validate_config()
     if errors:
@@ -74,34 +75,48 @@ async def main():
     
     print_config_info()
     
+    bot = None
+
+    def shutdown_handler():
+        logging.info("🛑 Получен сигнал остановки, завершаю работу...")
+        if bot and bot.client:
+            bot.client.disconnect()
+
+    loop = asyncio.get_event_loop()
+    if sys.platform != 'win32':
+        for sig in (signal.SIGINT, signal.SIGTERM):
+            loop.add_signal_handler(sig, shutdown_handler)
+
     try:
         logging.info("🚀 Инициализация компонентов...")
-        
+
         db_manager = DatabaseManager()
         logging.info("✅ База данных инициализирована")
-        
+
         classifier = UniversalMessageClassifier(db_manager=db_manager)
         logging.info("✅ Классификатор инициализирован")
-        
+
         bot = TelegramBot(db_manager=db_manager, classifier=classifier)
         logging.info("✅ Telegram бот инициализирован")
-        
+
         stats = classifier.get_stats()
         logging.info(f"📊 Модель: {'обучена' if stats['is_trained'] else 'не обучена'}")
         logging.info(f"📚 Примеров для обучения: {stats['training_examples']}")
-        
+
         if stats.get('accuracy'):
             logging.info(f"🎯 Точность модели: {stats['accuracy']:.2%}")
-        
+
         logging.info("🚀 Запуск бота...")
         await bot.run()
-        
+
     except KeyboardInterrupt:
         logging.info("🛑 Получен сигнал остановки")
     except Exception as e:
         logging.error(f"❌ Критическая ошибка: {e}")
         sys.exit(1)
     finally:
+        if bot:
+            await bot.stop()
         logging.info("👋 Завершение работы")
 
 def print_help():
@@ -121,7 +136,7 @@ def print_help():
 • 📈 Система обратной связи для улучшения точности
 
 **Настройка:**
-1. Скопируйте env_example.txt в .env
+1. Скопируйте .env.example в .env
 2. Заполните настройки Telegram API
 3. Настройте ключевые слова под вашу сферу
 4. Укажите целевых пользователей

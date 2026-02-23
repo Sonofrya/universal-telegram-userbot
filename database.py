@@ -230,16 +230,17 @@ class DatabaseManager:
         try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
+                date_modifier = f'-{int(days)} days'
                 cursor.execute('''
-                    SELECT 
+                    SELECT
                         SUM(messages_processed) as total_processed,
                         SUM(messages_forwarded) as total_forwarded,
                         SUM(messages_rejected) as total_rejected,
                         SUM(training_examples_added) as total_training,
                         COUNT(*) as active_days
-                    FROM bot_stats 
-                    WHERE date >= date('now', '-{} days')
-                '''.format(days))
+                    FROM bot_stats
+                    WHERE date >= date('now', ?)
+                ''', (date_modifier,))
                 
                 row = cursor.fetchone()
                 if row:
@@ -261,16 +262,17 @@ class DatabaseManager:
         try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
+                date_modifier = f'-{int(days)} days'
                 cursor.execute('''
-                    DELETE FROM messages 
-                    WHERE created_at < datetime('now', '-{} days')
-                '''.format(days))
+                    DELETE FROM messages
+                    WHERE created_at < datetime('now', ?)
+                ''', (date_modifier,))
                 deleted_messages = cursor.rowcount
-                
+
                 cursor.execute('''
-                    DELETE FROM bot_stats 
-                    WHERE date < date('now', '-{} days')
-                '''.format(days))
+                    DELETE FROM bot_stats
+                    WHERE date < date('now', ?)
+                ''', (date_modifier,))
                 deleted_stats = cursor.rowcount
                 
                 conn.commit()

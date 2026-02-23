@@ -81,15 +81,15 @@ FILTER_BLACKLIST=спам,реклама
 
 def create_env_from_example():
     """Создает .env файл из примера"""
-    if os.path.exists('env_example.txt'):
+    if os.path.exists('.env.example'):
         try:
-            shutil.copy('env_example.txt', '.env')
+            shutil.copy('.env.example', '.env')
             print("✅ Файл .env создан из примера")
             print("📝 Отредактируйте файл .env и заполните настройки")
         except Exception as e:
             print(f"❌ Ошибка копирования файла: {e}")
     else:
-        print("❌ Файл env_example.txt не найден")
+        print("❌ Файл .env.example не найден")
 
 def main():
     """Главная функция"""

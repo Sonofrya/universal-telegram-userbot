@@ -22,7 +22,7 @@
 
 ### 1. Клонирование репозитория
 ```bash
-git clone https://github.com/yourusername/universal-telegram-bot.git
+git clone <url-вашего-репозитория>
 cd universal-telegram-bot
 ```
 
@@ -40,7 +40,7 @@ python setup.py
 
 #### Ручная настройка:
 ```bash
-cp env_example.txt .env
+cp .env.example .env
 # Отредактируйте .env файл
 ```
 
@@ -167,14 +167,14 @@ FILTER_FORWARD_PATTERNS=пересланное сообщение,forwarded mess
 ├── telegram_bot.py         # Telegram API
 ├── utils.py               # Утилиты
 ├── requirements.txt       # Зависимости
-├── env_example.txt        # Пример конфигурации
+├── .env.example        # Пример конфигурации
 └── README.md             # Документация
 ```
 
 ### Добавление новой сферы
 
 1. Добавьте конфигурацию в `utils.py` → `get_business_domain_examples()`
-2. Обновите примеры в `env_example.txt`
+2. Обновите примеры в `.env.example`
 3. Протестируйте с новыми ключевыми словами
 
 ## 🔒 Безопасность
@@ -207,21 +207,6 @@ MIT License - используйте свободно для любых целе
 4. Отправьте в ветку (`git push origin feature/amazing-feature`)
 5. Создайте Pull Request
 
-## 📄 Лицензия
-
-Этот проект лицензирован под MIT License - см. файл [LICENSE](LICENSE) для подробностей.
-
-## 🆘 Поддержка
-
-- 📖 [Документация](README.md)
-- 🐛 [Сообщить об ошибке](https://github.com/yourusername/universal-telegram-bot/issues)
-- 💡 [Предложить функцию](https://github.com/yourusername/universal-telegram-bot/issues)
-- 💬 [Обсуждения](https://github.com/yourusername/universal-telegram-bot/discussions)
-
-## ⭐ Звезды
-
-Если проект вам понравился, поставьте звезду! ⭐
-
 ---
 
-**Создано с ❤️ для автоматизации бизнес-процессов**
+**Создано для автоматизации бизнес-процессов**

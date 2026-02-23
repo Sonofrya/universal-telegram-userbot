@@ -30,7 +30,7 @@ pip install -r requirements.txt
 python setup.py
 
 # Или ручная настройка
-cp env_example.txt .env
+cp .env.example .env
 # Отредактируйте .env файл
 ```
 

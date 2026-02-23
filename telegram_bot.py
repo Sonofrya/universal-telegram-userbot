@@ -3,6 +3,9 @@
 """
 import logging
 import os
+import re
+import time
+import asyncio
 from typing import List, Optional, Dict, Any
 from telethon import TelegramClient, events
 from telethon.sessions import StringSession
@@ -25,6 +28,10 @@ class TelegramBot:
             'rejected': 0,
             'training_examples': 0
         }
+        # Rate limiting: макс. 20 пересылок в минуту
+        self._forward_timestamps: List[float] = []
+        self._max_forwards_per_minute = 20
+        self._max_text_length = 1000
         
         # Инициализируем клиент
         self._init_client()
@@ -80,6 +87,18 @@ class TelegramBot:
             logging.error(f"❌ Ошибка запуска бота: {e}")
             return False
     
+    def _check_rate_limit(self) -> bool:
+        """Проверяет, не превышен ли лимит пересылок"""
+        now = time.time()
+        # Удаляем timestamps старше 60 секунд
+        self._forward_timestamps = [
+            ts for ts in self._forward_timestamps if now - ts < 60
+        ]
+        if len(self._forward_timestamps) >= self._max_forwards_per_minute:
+            return False
+        self._forward_timestamps.append(now)
+        return True
+
     async def _preload_user_entities(self):
         """Предварительно загружает сущности пользователей"""
         try:
@@ -311,8 +330,12 @@ class TelegramBot:
         
         self.db_manager.save_message(message_data)
         
-        # Пересылаем если нужно
+        # Пересылаем если нужно (с проверкой rate limit)
         if analysis['should_forward']:
+            if not self._check_rate_limit():
+                logging.warning("⚠️ Rate limit: слишком много пересылок в минуту, пропускаю")
+                self.daily_stats['rejected'] += 1
+                return
             await self._forward_message(event, analysis, message_data)
             self.daily_stats['forwarded'] += 1
         else:
@@ -338,7 +361,6 @@ class TelegramBot:
         
         # Проверяем служебные сообщения о пересылке
         for pattern in config.filter.forward_patterns:
-            import re
             if re.search(pattern, text_lower, re.IGNORECASE):
                 logging.info("Пропущено служебное сообщение о пересылке")
                 return False
@@ -348,8 +370,10 @@ class TelegramBot:
     async def _analyze_message(self, text: str) -> Dict[str, Any]:
         """Анализирует сообщение на релевантность"""
         from utils import clean_text, calculate_similarity, is_about_full_cycle_production
-        
-        cleaned_text = clean_text(text)
+
+        # Ограничиваем длину текста для ML-обработки
+        text_for_analysis = text[:self._max_text_length] if len(text) > self._max_text_length else text
+        cleaned_text = clean_text(text_for_analysis)
         
         # Семантическое сходство
         similarity = calculate_similarity(
@@ -359,10 +383,10 @@ class TelegramBot:
         )
         
         # Проверка на полный цикл
-        is_full_cycle = is_about_full_cycle_production(text)
-        
+        is_full_cycle = is_about_full_cycle_production(text_for_analysis)
+
         # ML предсказание
-        ml_probability = self.classifier.predict(text)
+        ml_probability = self.classifier.predict(text_for_analysis)
         
         # Решение о пересылке
         if ml_probability is not None and self.classifier.is_trained:

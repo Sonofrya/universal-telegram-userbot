@@ -50,7 +50,7 @@ universal-telegram-bot/
 ├── MIGRATION_GUIDE.md             # Миграция с старой версии
 ├── GITHUB_SETUP.md               # Эта инструкция
 ├── PULL_REQUEST_TEMPLATE.md      # Шаблон для PR
-├── env_example.txt               # Пример конфигурации
+├── .env.example               # Пример конфигурации
 ├── requirements.txt              # Зависимости Python
 ├── setup.py                      # Интерактивная настройка
 ├── examples.py                   # Примеры использования
